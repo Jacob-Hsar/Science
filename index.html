@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HJS Exam 2026 - Full Auto-Check</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --gold: #D4AF37;
+            --gold-dark: #B8860B;
+            --gold-light: #EEDDCC;
+            --white: #FFFFFF;
+            --cream: #FDF8F0;
+            --shadow-heavy: 0 30px 60px rgba(0, 0, 0, 0.12);
+            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --radius: 28px;
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans Myanmar', sans-serif;
+            background: linear-gradient(145deg, #f5efe6 0%, #e8ddd0 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1ede8; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        /* Login */
+        #loginScreen {
+            background: var(--white);
+            border-radius: var(--radius);
+            padding: 50px 45px 40px;
+            max-width: 460px;
+            width: 100%;
+            box-shadow: var(--shadow-heavy), 0 0 0 1px rgba(212, 175, 55, 0.15);
+            border-top: 8px solid var(--gold);
+            text-align: center;
+        }
+        #loginScreen .logo-wrapper img { max-height: 75px; width: auto; margin-bottom: 15px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.06)); }
+        #loginScreen h1 { font-size: 28px; font-weight: 700; color: #2c241a; }
+        #loginScreen .sub-title { color: #7a6a55; font-size: 15px; margin-bottom: 25px; border-bottom: 2px solid var(--gold-light); padding-bottom: 12px; display: inline-block; }
+        .login-box { display: flex; flex-direction: column; gap: 16px; }
+        .login-box input {
+            width: 100%; padding: 16px 22px; border: 2px solid #e8e0d6; border-radius: 16px;
+            font-size: 16px; background: #faf8f5; transition: 0.25s; outline: none;
+        }
+        .login-box input:focus { border-color: var(--gold); box-shadow: 0 0 0 5px rgba(212,175,55,0.12); }
+        .login-box button {
+            background: linear-gradient(145deg, #D4AF37, #B8860B); color: white; border: none;
+            padding: 16px; border-radius: 16px; font-size: 18px; font-weight: 700; cursor: pointer;
+            transition: 0.25s; box-shadow: 0 8px 24px rgba(184,134,11,0.25);
+        }
+        .login-box button:hover { transform: translateY(-3px); box-shadow: 0 14px 32px rgba(184,134,11,0.35); }
+        .login-hint { color: #9a8a78; font-size: 14px; background: #f4efe8; padding: 8px 16px; border-radius: 40px; display: inline-block; margin: 5px auto 0; }
+        .login-hint strong { color: var(--gold-dark); }
+        .footer-note { margin-top: 25px; font-size: 13px; color: #b3a392; border-top: 1px solid #ede6dc; padding-top: 18px; }
+
+        /* Exam */
+        #examScreen {
+            display: none; background: var(--white); border-radius: var(--radius);
+            box-shadow: var(--shadow-heavy); max-width: 1000px; width: 100%; overflow: hidden;
+            border: 1px solid rgba(212,175,55,0.2);
+        }
+        .exam-header {
+            background: var(--white); padding: 14px 30px; border-bottom: 3px solid var(--gold);
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
+            position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.96); backdrop-filter: blur(6px);
+        }
+        .exam-header .brand { display: flex; align-items: center; gap: 14px; }
+        .exam-header .brand img { height: 40px; }
+        .exam-header .brand .title h2 { font-size: 18px; color: var(--gold-dark); font-weight: 700; }
+        .exam-header .brand .title span { font-size: 12px; color: #7a6a55; }
+        .exam-header .timer {
+            background: #1e1c1a; color: var(--gold); padding: 6px 22px; border-radius: 40px;
+            font-weight: 700; font-size: 20px; border: 1px solid var(--gold);
+        }
+        .exam-body { padding: 30px 35px 40px; background: #fcfaf7; }
+        .section-title {
+            font-size: 20px; font-weight: 700; color: var(--gold-dark);
+            margin: 30px 0 18px 0; padding-bottom: 10px;
+            border-bottom: 3px double var(--gold-light); display: flex; align-items: center; gap: 12px;
+        }
+        .section-title:first-of-type { margin-top: 0; }
+        .q-card {
+            background: var(--white); border-radius: 16px; padding: 18px 24px;
+            margin-bottom: 14px; border: 1px solid #ede8e0; transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .q-card:hover { border-color: var(--gold-light); box-shadow: 0 6px 16px rgba(0,0,0,0.04); }
+        .q-text { font-weight: 600; font-size: 16px; color: #2c241a; margin-bottom: 12px; line-height: 1.7; }
+        .options-grid { display: flex; flex-wrap: wrap; gap: 8px 30px; padding-left: 6px; }
+        .options-grid label { display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer; }
+        .options-grid input[type="radio"] { accent-color: var(--gold); width: 18px; height: 18px; }
+        .tf-group { display: flex; gap: 35px; padding-left: 6px; }
+        .tf-group label { display: flex; align-items: center; gap: 10px; font-weight: 500; cursor: pointer; }
+        .tf-group input[type="radio"] { accent-color: var(--gold); width: 18px; height: 18px; }
+        textarea {
+            width: 100%; padding: 14px 18px; border: 2px solid #e8e0d6; border-radius: 14px;
+            font-family: inherit; font-size: 15px; background: #fefcf9; resize: vertical;
+            transition: 0.25s; min-height: 75px; color: #1f1a14; line-height: 1.6;
+        }
+        textarea:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 0 5px rgba(212,175,55,0.08); }
+        .submit-section { margin-top: 35px; display: flex; justify-content: center; }
+        .btn-submit {
+            background: linear-gradient(145deg, #D4AF37, #B8860B); color: white; border: none;
+            padding: 16px 50px; border-radius: 50px; font-size: 20px; font-weight: 700;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 8px 24px rgba(184,134,11,0.25);
+            width: 100%; max-width: 380px;
+        }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(184,134,11,0.35); }
+
+        /* Result */
+        #resultArea { margin-top: 30px; }
+        .result-card {
+            background: var(--white); border-radius: 20px; padding: 28px 32px;
+            border: 2px solid var(--gold-light); box-shadow: var(--shadow-soft);
+        }
+        .result-score { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 2px solid #f0e8dc; padding-bottom: 18px; margin-bottom: 18px; }
+        .result-score h2 { font-size: 28px; color: var(--gold-dark); }
+        .result-score .badge { background: var(--gold); padding: 6px 20px; border-radius: 40px; color: white; font-weight: 700; }
+        .answer-compare {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+            background: #f8f5f0; padding: 16px; border-radius: 14px; margin-bottom: 12px;
+            border-left: 5px solid var(--gold);
+        }
+        .answer-compare .user-ans { color: #a0522d; }
+        .answer-compare .model-ans { color: #1e5a3c; }
+        .answer-compare .missing { background: #ffebee; padding: 2px 6px; border-radius: 4px; color: #c62828; }
+        .explain-item { background: #fff6f0; padding: 14px 20px; border-radius: 14px; margin-bottom: 8px; border-left: 6px solid #d9534f; color: #4d2e2a; font-size: 15px; }
+        .no-error { background: #edf7ea; border-left: 6px solid #2e7d32; padding: 16px 20px; border-radius: 14px; color: #1e4a22; font-weight: 600; }
+        .part-score { font-weight: 600; margin: 10px 0 5px; color: #3d3226; }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            #loginScreen { padding: 30px 20px; }
+            .exam-body { padding: 18px 14px; }
+            .exam-header { flex-direction: column; align-items: stretch; text-align: center; }
+            .exam-header .brand { justify-content: center; }
+            .options-grid { flex-direction: column; gap: 4px; }
+            .tf-group { flex-direction: column; gap: 6px; }
+            .result-score { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .answer-compare { grid-template-columns: 1fr; gap: 10px; }
+        }
+        .fullscreen-mode { padding: 0 !important; background: #f4efe7 !important; align-items: flex-start; }
+        .fullscreen-mode #examScreen { max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; border: none; overflow-y: auto; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN -->
+    <div id="loginScreen">
+        <div class="logo-wrapper"><img src="logo1.png" alt="HJS Logo" /></div>
+        <h1>HJS EXAM 2026</h1>
+        <div class="sub-title">🏛️ House of J&S Computer Training</div>
+        <div class="login-box">
+            <input type="text" id="studentName" placeholder="ကျောင်းသား / ကျောင်းသူ အမည်" />
+            <input type="password" id="password" placeholder="စကားဝှက်" />
+            <button onclick="login()">🔑 ဝင်ရောက်ဖြေဆိုရန်</button>
+            <span class="login-hint">🔐 စကားဝှက်: <strong>HJS2026</strong></span>
+        </div>
+        <div class="footer-note">© 2026 House of J&S • CIE Standard</div>
+    </div>
+
+    <!-- EXAM -->
+    <div id="examScreen">
+        <div class="exam-header">
+            <div class="brand">
+                <img src="logo1.png" alt="HJS Logo" />
+                <div class="title"><h2>📘 စာမေးပွဲစာတမ်း</h2><span id="studentDisplay">ကျောင်းသား: </span></div>
+            </div>
+            <div class="timer" id="timerDisplay">⏳ 60:00</div>
+        </div>
+        <div class="exam-body" id="examBody"></div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  1. EXAM DATA (မေးခွန်းများနှင့် အဖြေများ)
+        // ================================================================
+        const examData = {
+            mcq: [
+                { q: "The force that pulls objects towards the Earth is called _____", opts: ["Friction", "Gravity", "Magnetism", "Tension"], ans: 1 },
+                { q: "Weight is measured in _____", opts: ["Kilograms", "Grams", "Newtons", "Metres"], ans: 2 },
+                { q: "Mass is measured using a _____", opts: ["Thermometer", "Balance", "Ruler", "Spring"], ans: 1 },
+                { q: "The mass of an object _____ when it is taken to the Moon", opts: ["Increases", "Decreases", "Stays the same", "Becomes zero"], ans: 2 },
+                { q: "The force acting on an object because of gravity is called its _____", opts: ["Mass", "Weight", "Volume", "Density"], ans: 1 },
+                { q: "Which is at the centre of our Solar System?", opts: ["Earth", "Moon", "Sun", "Jupiter"], ans: 2 },
+                { q: "Earth takes approximately _____ to orbit the Sun once.", opts: ["24 hours", "7 days", "28 days", "365 days"], ans: 3 },
+                { q: "The Moon is a _____ of Earth.", opts: ["Planet", "Star", "Natural satellite", "Comet"], ans: 2 },
+                { q: "The apparent movement of the Sun across the sky is mainly caused by the _____ of Earth.", opts: ["Revolution", "Rotation", "Gravity", "Orbit of the Moon"], ans: 1 },
+                { q: "The Moon takes approximately _____ to orbit Earth.", opts: ["1 day", "7 days", "28 days", "365 days"], ans: 2 }
+            ],
+            tf: [
+                { q: "Mass and weight are exactly the same thing.", ans: false },
+                { q: "Weight depends on the strength of gravity.", ans: true },
+                { q: "The mass of a person changes when they travel from Earth to the Moon.", ans: false },
+                { q: "The Sun is a star.", ans: true },
+                { q: "Earth rotates on its axis.", ans: true },
+                { q: "Earth takes about one year to orbit the Sun.", ans: true },
+                { q: "The Moon has no effect on tides.", ans: false },
+                { q: "Kinetic energy is the energy of movement.", ans: true },
+                { q: "Energy can be completely destroyed when a machine stops working.", ans: false },
+                { q: "Friction can cause kinetic energy to be transferred into thermal energy.", ans: true }
+            ],
+            short: [
+                { q: "What is gravity? Give one example of its effect.", keywords: ['force', 'attracts', 'objects', 'pulls', 'ground'], model: "Gravity is a force that attracts objects towards each other. Example: Earth's gravity pulls objects towards the ground." },
+                { q: "What is the difference between mass and weight?", keywords: ['mass', 'amount of matter', 'weight', 'force due to gravity', 'force'], model: "Mass is the amount of matter in an object. Weight is the force acting on an object due to gravity." },
+                { q: "Name the unit used to measure: (a) mass (b) weight.", keywords: ['mass', 'kilogram', 'kg', 'weight', 'newton', 'N'], model: "(a) Mass → kilogram (kg). (b) Weight → newton (N)." },
+                { q: "Explain why a person's weight is different on the Moon compared with Earth.", keywords: ['moon', 'weaker gravity', 'less weight', 'mass stays the same'], model: "The Moon has weaker gravity than Earth, so a person has less weight on the Moon. Their mass stays the same." },
+                { q: "Name the eight planets in our Solar System.", keywords: ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune'], model: "Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune." },
+                { q: "What is the difference between rotation and orbit/revolution?", keywords: ['rotation', 'spinning around axis', 'orbit', 'revolution', 'moving around another object'], model: "Rotation is spinning around an axis. Orbit/revolution is moving around another object." },
+                { q: "Explain why we have day and night on Earth.", keywords: ['rotates on its axis', 'side facing sun', 'day', 'side facing away', 'night'], model: "Earth rotates on its axis. The side facing the Sun has day, while the side facing away has night." },
+                { q: "What are tides? Name the two main types of tides.", keywords: ['regular rises and falls', 'sea level', 'high tide', 'low tide'], model: "Tides are the regular rises and falls of sea level. The two main types are high tide and low tide." },
+                { q: "What is energy? Name any three forms of energy.", keywords: ['ability to cause change', 'do work', 'kinetic', 'thermal', 'chemical', 'light', 'sound'], model: "Energy is the ability to cause change or do work. Three forms include kinetic, thermal and chemical energy." },
+                { q: "Explain what happens to energy when a person rides a bicycle and then stops.", keywords: ['chemical energy', 'kinetic energy', 'friction', 'thermal energy', 'sound'], model: "While cycling, chemical energy is transferred into kinetic energy. When stops, friction transfers kinetic into thermal energy and sound." }
+            ],
+            structured: [
+                { q: "A student has a mass of 40 kg on Earth. (a) What is the student's mass on the Moon? (b) Would the student's weight be the same on the Moon? Explain. (c) State the unit of weight. (d) Explain how gravity affects the weight of an object.",
+                  keywords: ['40 kg', 'no', 'less', 'weaker gravity', 'newton', 'N', 'gravity attracts', 'stronger gravity', 'greater weight'], 
+                  model: "(a) 40 kg. (b) No. The student's weight would be less on the Moon because the Moon's gravitational pull is weaker. (c) Newton (N). (d) Gravity is the force that attracts objects. The stronger the gravitational field, the greater an object's weight." },
+                { q: "What is the Solar System? What is at the centre? Explain the difference between Earth's rotation and its orbit around the Sun. Explain how Earth's rotation causes day and night.",
+                  keywords: ['sun', 'objects that orbit it', 'planets', 'sun at centre', 'rotation', 'spinning on axis', 'orbit', 'movement around sun', '24 hours', 'day', 'night'], 
+                  model: "(a) The Solar System is the Sun and all the objects that orbit it. (b) The Sun is at the centre. (c) Rotation is the spinning of Earth around its axis. Orbit is its movement around the Sun. (d) Earth rotates once every 24 hours. The side facing the Sun experiences day, while the side facing away experiences night." },
+                { q: "Consider an electric fan connected to a battery. (a) What type of energy is stored in the battery? (b) What useful energy does the fan produce? (c) Name one other form of energy produced by the fan. (d) Explain why we say that energy is transferred, rather than destroyed.",
+                  keywords: ['chemical energy', 'kinetic energy', 'movement', 'thermal', 'sound', 'transferred', 'not destroyed', 'one form to another'], 
+                  model: "(a) Chemical energy. (b) Kinetic energy (movement of the fan blades). (c) Thermal energy or sound energy. (d) Energy is not destroyed. The chemical energy is transferred into other forms, such as kinetic, thermal and sound. Therefore, energy is transferred from one form to another, rather than disappearing." }
+            ]
+        };
+
+        // ================================================================
+        //  2. GLOBALS
+        // ================================================================
+        let timerInterval = null;
+        let timeSeconds = 3600;
+        let examSubmitted = false;
+
+        // ================================================================
+        //  3. LOGIN
+        // ================================================================
+        function login() {
+            const name = document.getElementById('studentName').value.trim();
+            const pass = document.getElementById('password').value.trim();
+            if (pass !== 'HJS2026') { alert('❌ စကားဝှက် မှားနေပါသည်။ (Password: HJS2026)'); return; }
+            if (name === '') { alert('ကျေးဇူးပြု၍ သင့်နာမည် ထည့်ပါ။'); return; }
+
+            document.getElementById('loginScreen').style.display = 'none';
+            const examScreen = document.getElementById('examScreen');
+            examScreen.style.display = 'block';
+            document.getElementById('studentDisplay').textContent = 'ကျောင်းသား: ' + name;
+            renderExam();
+            startTimer();
+            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(() => {});
+            document.body.classList.add('fullscreen-mode');
+
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            document.addEventListener('keydown', (e) => { if (e.ctrlKey && ['u','U','c','C','s','S','p','P'].includes(e.key)) e.preventDefault(); if (e.key === 'F12') e.preventDefault(); });
+            document.addEventListener('copy', e => e.preventDefault());
+            document.addEventListener('paste', e => e.preventDefault());
+        }
+
+        // ================================================================
+        //  4. RENDER EXAM
+        // ================================================================
+        function renderExam() {
+            const body = document.getElementById('examBody');
+            let html = '';
+
+            // Part A
+            html += `<div class="section-title">📍 Part A – Multiple Choice (၂၀ မှတ်)</div>`;
+            examData.mcq.forEach((item, i) => {
+                html += `<div class="q-card"><div class="q-text">${i+1}. ${item.q}</div><div class="options-grid">`;
+                item.opts.forEach((opt, j) => { html += `<label><input type="radio" name="mcq_${i}" value="${j}" /> ${opt}</label>`; });
+                html += `</div></div>`;
+            });
+
+            // Part B
+            html += `<div class="section-title">📍 Part B – True / False (၂၀ မှတ်)</div>`;
+            examData.tf.forEach((item, i) => {
+                html += `<div class="q-card"><div class="q-text">${i+1}. ${item.q}</div><div class="tf-group">
+                            <label><input type="radio" name="tf_${i}" value="true" /> True</label>
+                            <label><input type="radio" name="tf_${i}" value="false" /> False</label>
+                        </div></div>`;
+            });
+
+            // Part C
+            html += `<div class="section-title">📍 Part C – Short Answer (၃၀ မှတ်) [သော့ချက်စာလုံးဖြင့် စစ်ဆေးမည်]</div>`;
+            examData.short.forEach((item, i) => {
+                html += `<div class="q-card"><div class="q-text">${i+1}. ${item.q}</div>
+                            <textarea name="short_${i}" rows="2" placeholder="သင့်အဖြေကို ဤနေရာတွင် ရေးပါ..."></textarea>
+                        </div>`;
+            });
+
+            // Part D
+            html += `<div class="section-title">📍 Part D – Structured Questions (၃၀ မှတ်) [သော့ချက်စာလုံးဖြင့် စစ်ဆေးမည်]</div>`;
+            examData.structured.forEach((item, i) => {
+                html += `<div class="q-card"><div class="q-text">${i+1}. ${item.q}</div>
+                            <textarea name="struct_${i}" rows="4" placeholder="သင့်အဖြေကို ဤနေရာတွင် အသေးစိတ်ရေးပါ..."></textarea>
+                        </div>`;
+            });
+
+            html += `<div class="submit-section"><button class="btn-submit" onclick="submitExam()">✅ စာရွက်ပြန်စစ်ရန် (Submit)</button></div>`;
+            html += `<div id="resultArea"></div>`;
+            body.innerHTML = html;
+        }
+
+        // ================================================================
+        //  5. TIMER
+        // ================================================================
+        function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (examSubmitted) return;
+                timeSeconds--;
+                updateTimerDisplay();
+                if (timeSeconds <= 0) { clearInterval(timerInterval); alert('⏰ ချိန်ကုန်ပါပြီ။'); submitExam(); }
+            }, 1000);
+        }
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeSeconds / 60);
+            const secs = timeSeconds % 60;
+            const el = document.getElementById('timerDisplay');
+            el.textContent = `⏳ ${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+            el.style.color = timeSeconds < 300 ? '#d9534f' : 'var(--gold)';
+            el.style.borderColor = timeSeconds < 300 ? '#d9534f' : 'var(--gold)';
+        }
+
+        // ================================================================
+        //  6. SUBMIT & AUTO-CHECK (အပြည့်အစုံ)
+        // ================================================================
+        function submitExam() {
+            if (examSubmitted) return;
+            examSubmitted = true;
+            if (timerInterval) clearInterval(timerInterval);
+
+            let totalScore = 0;
+            let mcqScore = 0, tfScore = 0, shortScore = 0, structScore = 0;
+            let wrongList = [];
+            let detailsHTML = '';
+
+            // ---- A) MCQ ----
+            examData.mcq.forEach((item, i) => {
+                const selected = document.querySelector(`input[name="mcq_${i}"]:checked`);
+                const val = selected ? parseInt(selected.value) : -1;
+                if (val === item.ans) mcqScore += 2;
+                else {
+                    const correctAns = item.opts[item.ans];
+                    wrongList.push(`<strong>MCQ ${i+1}</strong> မှားသည်။ မှန်ကန်သောအဖြေ = <strong>"${correctAns}"</strong>`);
+                }
+            });
+
+            // ---- B) True/False ----
+            examData.tf.forEach((item, i) => {
+                const selected = document.querySelector(`input[name="tf_${i}"]:checked`);
+                const val = selected ? selected.value === 'true' : null;
+                if (val === item.ans) tfScore += 2;
+                else {
+                    const correctAns = item.ans ? 'True' : 'False';
+                    wrongList.push(`<strong>True/False ${i+1}</strong> မှားသည်။ မှန်ကန်သောအဖြေ = <strong>"${correctAns}"</strong>`);
+                }
+            });
+
+            // ---- C) Short Answer (Keyword based) ----
+            examData.short.forEach((item, i) => {
+                const userAns = document.querySelector(`textarea[name="short_${i}"]`).value.trim();
+                let found = 0;
+                const lowerUser = userAns.toLowerCase();
+                const kw = item.keywords;
+                kw.forEach(k => { if (lowerUser.includes(k.toLowerCase())) found++; });
+                // Max 3 marks per question
+                const earned = Math.min(found, 3);
+                shortScore += earned;
+                if (earned < 3) {
+                    detailsHTML += `<div class="answer-compare">
+                        <div class="user-ans"><strong>✏️ သင့်အဖြေ (Q${i+1}):</strong> ${userAns || '(မဖြေရသေးပါ)'}</div>
+                        <div class="model-ans"><strong>✅ မှန်ကန်သောအဖြေ:</strong> ${item.model}</div>
+                    </div>`;
+                }
+            });
+
+            // ---- D) Structured (Keyword based) ----
+            examData.structured.forEach((item, i) => {
+                const userAns = document.querySelector(`textarea[name="struct_${i}"]`).value.trim();
+                let found = 0;
+                const lowerUser = userAns.toLowerCase();
+                const kw = item.keywords;
+                kw.forEach(k => { if (lowerUser.includes(k.toLowerCase())) found++; });
+                // Max 10 marks per question (scale from total keywords)
+                const maxKw = kw.length;
+                const earned = Math.min(Math.round((found / maxKw) * 10), 10);
+                structScore += earned;
+                if (earned < 10) {
+                    detailsHTML += `<div class="answer-compare">
+                        <div class="user-ans"><strong>✏️ သင့်အဖြေ (Structured Q${i+1}):</strong> ${userAns || '(မဖြေရသေးပါ)'}</div>
+                        <div class="model-ans"><strong>✅ မှန်ကန်သောအဖြေ:</strong> ${item.model}</div>
+                    </div>`;
+                }
+            });
+
+            totalScore = mcqScore + tfScore + shortScore + structScore;
+
+            // ---- Build Result UI ----
+            let resultHtml = `<div class="result-card">
+                <div class="result-score">
+                    <h2>📊 စုစုပေါင်းရမှတ်: ${totalScore} / ၁၀၀</h2>
+                    <span class="badge">✅ အောင်မြင်မှု ${totalScore >= 40 ? '🎉 အောင်ပါသည်!' : '😓 ပြန်လေ့လာပါ'}</span>
+                </div>
+                <div style="display:flex; flex-wrap:wrap; gap:10px 20px; margin-bottom:15px; background:#f4efe8; padding:12px 16px; border-radius:12px;">
+                    <span><strong>MCQ:</strong> ${mcqScore}/၂၀</span>
+                    <span><strong>True/False:</strong> ${tfScore}/၂၀</span>
+                    <span><strong>Short Answer:</strong> ${shortScore}/၃၀</span>
+                    <span><strong>Structured:</strong> ${structScore}/၃၀</span>
+                </div>`;
+
+            if (wrongList.length > 0) {
+                resultHtml += `<div style="margin:12px 0 8px; font-weight:700; color:#4a2c1a;">📖 အမှားများအတွက် ရှင်းလင်းချက် (မြန်မာလို):</div>`;
+                wrongList.forEach(msg => { resultHtml += `<div class="explain-item">${msg}</div>`; });
+            } else {
+                resultHtml += `<div class="no-error">🎉 ဂုဏ်ယူပါတယ်! Part A နှင့် B တွင် အမှားတစ်ခုမှ မရှိပါ။</div>`;
+            }
+
+            // Show detailed comparison for Part C & D if they lost marks
+            if (detailsHTML) {
+                resultHtml += `<div style="margin-top:20px; border-top: 2px dashed #d4af37; padding-top:15px;">
+                    <h3 style="color:#b8860b;">🔍 Part C & D အဖြေများ နှိုင်းယှဉ်ချက်</h3>
+                    ${detailsHTML}
+                </div>`;
+            } else {
+                resultHtml += `<div style="margin-top:20px; border-top: 2px dashed #d4af37; padding-top:15px;">
+                    <h3 style="color:#b8860b;">🌟 Part C & D အတွက် သင့်အဖြေများ မှန်ကန်နေပါသည်။</h3>
+                </div>`;
+            }
+
+            resultHtml += `</div>`;
+            document.getElementById('resultArea').innerHTML = resultHtml;
+            document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+
+            // Disable all inputs
+            document.querySelectorAll('input, textarea').forEach(el => el.disabled = true);
+        }
+    </script>
+</body>
+</html>
